@@ -1,5 +1,4 @@
-# plug-n-play-uncertainty-nlg
-Plug-and-play Uncertainty Estimation in Natural Language Generation
+# Plug-and-play Uncertainty Estimation in Natural Language Generation
 
 Install the required dependencies:
 
