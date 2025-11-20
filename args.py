@@ -14,7 +14,7 @@ class Args:
         # (1.1) general
         self.seed_value = 42
         self.num_total_generations = 10
-        self.max_length_of_generated_sequence = 50 # depends on the dataset
+        self.max_length_of_generated_sequence = 25 # depends on the dataset. 25 is good for TruthfulQA
         self.eos_token_ids = 4                     # 4: "." (period)
         self.invalid_ids = [673, 894, 13, 903]  #  invalid tokens for llama-2 and mistral
         # self.invalid_ids = [2, 50118, 1209, 1864] # invalid tokens for opt class of models
