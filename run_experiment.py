@@ -14,10 +14,10 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader, Dataset
 
 from args import Args
-from utils import seed_everything, get_models_and_tokenizers, compute_correctness, compute_semantic_paris_new
+from utils import seed_everything, compute_correctness, compute_semantic_paris_new
 from utils import generate_text, prepare_generated_text, compute_likelihood, prepare_likelihood
 from sdlg import generate_semantically_diverse_output_sequences
-from transformers import AutoTokenizer,LlamaForCausalLM,AutoModelForSequenceClassification,AutoModelForCausalLM, OPTForCausalLM
+from transformers import AutoTokenizer, LlamaForCausalLM, AutoModelForSequenceClassification, AutoModelForCausalLM, OPTForCausalLM
 from datasets import load_dataset
 import traceback
 # from bleurt import score as bleurt_score
@@ -266,7 +266,7 @@ if __name__ == '__main__':
     #                                         # attn_implementation="flash_attention_2",
     #                                         # use_cache=True
     #                                           )
-    llm_model = llm_model.to(device_llm)
+    # llm_model = llm_model.to(device_llm)
     
     llm_model = AutoModelForCausalLM.from_pretrained(args.llm_model, torch_dtype=torch.bfloat16, token = auth_token).to(device_llm)
     llm_model.resize_token_embeddings(len(tokenizer))
