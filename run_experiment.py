@@ -214,7 +214,7 @@ def get_results(args, base_path, llm_model, tokenizer, device_llm,
 if __name__ == '__main__':
 
     args = Args()
-    args.run_id = 'truthful-llama_test'
+    args.run_id = 'truthful-llama'
     base_path = os.path.join('result', args.run_id)
     if not os.path.exists(base_path):
         os.makedirs(base_path, exist_ok=True)
