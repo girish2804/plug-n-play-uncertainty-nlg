@@ -85,14 +85,6 @@ for run_key in run_keys:
                                                                         start_sample_id=batch_start,
                                                                         base_path=base_path_cluster)
 
-        # Clean up large data immediately after loading
-        for results_dict in list_results_dict:
-            for x in results_dict[run_key]['epistem_entropies']:
-                del x['unfiltered_premature_logits']
-                del x['unfiltered_final_logits']
-                del x['tokens_kept_count']
-                del x['tokens_kept_percentage']
-
         # Initialize batch-level collections for THIS batch only
         batch_bleurt_scores = []
         batch_questions = []
