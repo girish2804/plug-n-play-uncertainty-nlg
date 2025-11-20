@@ -17,7 +17,7 @@ from args import Args
 from utils import seed_everything, compute_correctness, compute_semantic_paris_new
 from utils import generate_text, prepare_generated_text, compute_likelihood, prepare_likelihood
 from sdlg import generate_semantically_diverse_output_sequences
-from transformers import AutoTokenizer, LlamaForCausalLM, AutoModelForSequenceClassification, AutoModelForCausalLM, OPTForCausalLM
+from transformers import AutoTokenizer,AutoModelForSequenceClassification,AutoModelForCausalLM, OPTForCausalLM
 from datasets import load_dataset
 import traceback
 # from bleurt import score as bleurt_score
@@ -29,7 +29,7 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 def encode(examples, few_shot):
     # return tokenizer(f'''fact: {examples['fact1']}\n Considering the given fact. Answer the question by continuing the sentence. Provide your reasoning along with your answer.\n '', truncation=False, padding=False)
     # return tokenizer(f'''Question: {examples['question']}\n Choices: {', '.join(examples['choices']['text'])}\n Answer:''', truncation=False, padding=False)
-    return tokenizer(f'''{few_shot} Q: {examples['question']} A:''', truncation=False, padding=False)
+    return tokenizer(f'''Q: {examples['question']} A:''', truncation=False, padding=False)
     # return tokenizer(examples['knowledge'] + ' Q: ' + examples['question'] + ' A:', truncation=False, padding=False)
     # return tokenizer(few_shot + ' Q: ' + examples['question'] + ' A:', truncation=False, padding=False)
 
@@ -83,13 +83,13 @@ def get_results(args, base_path, llm_model, tokenizer, device_llm,
                                      decoding_method='most_likely', 
                                      device=device_llm)
             
-            most_likely_generation_dola = generate_text(args=args, 
-                                                 model=llm_model, 
-                                                 tokenizer=tokenizer, 
-                                                 input_ids=batch['input_ids'], 
-                                                 len_prompt=len(prompt), 
-                                                 decoding_method='dola', 
-                                                 device=device_llm)
+            # most_likely_generation_dola = generate_text(args=args, 
+            #                                      model=llm_model, 
+            #                                      tokenizer=tokenizer, 
+            #                                      input_ids=batch['input_ids'], 
+            #                                      len_prompt=len(prompt), 
+            #                                      decoding_method='dola', 
+            #                                      device=device_llm)
             
             reference_answers = batch['best_answer']
             # reference_answers = batch['solution']
@@ -127,33 +127,33 @@ def get_results(args, base_path, llm_model, tokenizer, device_llm,
                                                                     device=device_llm, 
                                                                     compute_cleaned=args.compute_cleaned, 
                                                                     store_logits=args.store_logits)
-            most_likely_generation_likelihoods_dola = compute_likelihood(prompt=prompt, 
-                                                                    generation=most_likely_generation_dola, 
-                                                                    model=llm_model, 
-                                                                    device=device_llm, 
-                                                                    compute_cleaned=args.compute_cleaned, 
-                                                                    store_logits=args.store_logits)
+            # most_likely_generation_likelihoods_dola = compute_likelihood(prompt=prompt, 
+            #                                                         generation=most_likely_generation_dola, 
+            #                                                         model=llm_model, 
+            #                                                         device=device_llm, 
+            #                                                         compute_cleaned=args.compute_cleaned, 
+            #                                                         store_logits=args.store_logits)
             ### (2) sample addtional output sequences
             
-            # sdlg with dola (2.0)
-            results_dict['dola_sdlg']['generations'].append(most_likely_generation_dola)
-            results_dict['dola_sdlg']['likelihoods'].append(most_likely_generation_likelihoods_dola)
+            # # sdlg with dola (2.0)
+            # results_dict['dola_sdlg']['generations'].append(most_likely_generation_dola)
+            # results_dict['dola_sdlg']['likelihoods'].append(most_likely_generation_likelihoods_dola)
             
-            results_dict = generate_semantically_diverse_output_sequences(results_dict=results_dict, 
-                                                                        deberta_model=deberta_model, 
-                                                                        deberta_tokenizer=deberta_tokenizer, 
-                                                                        device_deberta=device_deberta,
-                                                                        deberta_embeddings=deberta_embeddings,
-                                                                        model=llm_model, 
-                                                                        tokenizer=tokenizer, 
-                                                                        device_llm=device_llm,
-                                                                        input_ids=batch['input_ids'], 
-                                                                        prompt=prompt,
-                                                                        question=question, 
-                                                                        initial_generation=most_likely_generation_dola,
-                                                                        initial_likelihood=most_likely_generation_likelihoods_dola,
-                                                                        key = 'dola_sdlg',
-                                                                        args=args) 
+            # results_dict = generate_semantically_diverse_output_sequences(results_dict=results_dict, 
+            #                                                             deberta_model=deberta_model, 
+            #                                                             deberta_tokenizer=deberta_tokenizer, 
+            #                                                             device_deberta=device_deberta,
+            #                                                             deberta_embeddings=deberta_embeddings,
+            #                                                             model=llm_model, 
+            #                                                             tokenizer=tokenizer, 
+            #                                                             device_llm=device_llm,
+            #                                                             input_ids=batch['input_ids'], 
+            #                                                             prompt=prompt,
+            #                                                             question=question, 
+            #                                                             initial_generation=most_likely_generation_dola,
+            #                                                             initial_likelihood=most_likely_generation_likelihoods_dola,
+            #                                                             key = 'dola_sdlg',
+            #                                                             args=args) 
 
             # (2.1) SDLG
             results_dict['sdlg']['generations'].append(most_likely_generation)
@@ -196,9 +196,9 @@ def get_results(args, base_path, llm_model, tokenizer, device_llm,
                                                                                 device=device_llm, 
                                                                                 compute_cleaned=args.compute_cleaned, 
                                                                                 store_logits=args.store_logits))
-            # for x in results_dict['sdlg']['generations']:
-            #     print(x['generation_text'])
-            # print('sdlg^-----------------------------------')
+            for x in results_dict['sdlg']['generations']:
+                print(x['generation_text'])
+            print('sdlg^-----------------------------------')
             
             k = int(batch['question_id'])
             
@@ -214,7 +214,7 @@ def get_results(args, base_path, llm_model, tokenizer, device_llm,
 if __name__ == '__main__':
 
     args = Args()
-    args.run_id = 'truthful-llama'
+    args.run_id = 'truthful-llama_test'
     base_path = os.path.join('result', args.run_id)
     if not os.path.exists(base_path):
         os.makedirs(base_path, exist_ok=True)
@@ -250,7 +250,7 @@ if __name__ == '__main__':
     device_deberta = "mps" if torch.backends.mps.is_built() else f"cuda:{CUDA_ID_DEBERTA}" if torch.cuda.is_available() else "cpu"
     print("device_deberta: ", device_deberta)
     
-    auth_token = 'set huggingface authorization token'
+    auth_token = 'set your huggingface authorization token'
     
     args.llm_model =   ["mistralai/Mistral-7B-v0.1" ,'meta-llama/Llama-2-7b-hf'][1]
     # args.llm_model = 'facebook/opt-13b'
@@ -303,7 +303,7 @@ if __name__ == '__main__':
     # dataset_ = dataset['test'].add_column('question_id', values)
     
     num =len(dataset_)
-    # dataset_ = dataset_.select(range(671,num))
+    # dataset_ = dataset_.select(range(0,5))
     dataset_ = encode_and_format_dataset(dataset_, few_shot)
     
     get_results(args=args,
