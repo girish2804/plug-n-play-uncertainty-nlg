@@ -714,39 +714,39 @@ def compute_semantic_paris_new(base_path,
             if (f'semantic_pairs_{model_type}' not in results_dict[method].keys() or 
                 results_dict[method][f'semantic_pairs_{model_type}']['semantic_pairs'].shape[0] != len(results_dict[method]['generations'])):
                 
-            pairs = compute_batched_semantic_pairs(generations=results_dict[method]["generations"],
-                                                   deberta_tokenizer=deberta_tokenizer, 
-                                                   deberta_model=deberta_model, 
-                                                   question=results_dict['question'], 
-                                                   device=device,
-                                                   compute_cleaned=False,
-                                                   batch_size=32)
-
-            results_dict[method][f'semantic_pairs_{model_type}'] = pairs
-
-            target_pairs = torch.tensor(pairs['semantic_pairs'].astype(int), dtype=torch.float32, device='cuda:0')
-            seq_level_imp = sentence_importance(sdlg_gen_list[0], sdlg_gen_list[1:], nli_model_sent, target_pairs)
-
-            # NEW: Weight down by generation likelihood
-            # Extract numerical likelihood values from the prepared likelihood dictionaries
-            # Using average_neg_log_likelihood and converting to positive likelihood
-            likelihood_values = []
-            for likelihood_dict in prepared_likelihoods:
-                avg_neg_log_likelihood = likelihood_dict['average_neg_log_likelihood'][0]
-                # Convert negative log-likelihood to likelihood: likelihood = exp(-neg_log_likelihood)
-                likelihood = torch.exp(torch.tensor(-avg_neg_log_likelihood))
-                likelihood_values.append(likelihood)
-
-            # Convert to tensor and ensure same device as seq_level_imp
-            generation_likelihoods = torch.stack(likelihood_values).to(seq_level_imp.device)
-
-          # Add small epsilon to avoid division by zero
-            # epsilon = 1e-8
-            # generation_likelihoods = generation_likelihoods + epsilon
-
-            imp_weight =  generation_likelihoods / seq_level_imp 
-            imp_weight = seq_level_imp.detach().to('cpu')
-            results_dict[method]['seq_level_impo'] = imp_weight
-
-            with open(os.path.join(base_path, f'results_dict_{i}.pkl'), 'wb') as f:
-                pickle.dump(results_dict, f)
+                pairs = compute_batched_semantic_pairs(generations=results_dict[method]["generations"],
+                                                       deberta_tokenizer=deberta_tokenizer, 
+                                                       deberta_model=deberta_model, 
+                                                       question=results_dict['question'], 
+                                                       device=device,
+                                                       compute_cleaned=False,
+                                                       batch_size=32)
+    
+                results_dict[method][f'semantic_pairs_{model_type}'] = pairs
+    
+                target_pairs = torch.tensor(pairs['semantic_pairs'].astype(int), dtype=torch.float32, device='cuda:0')
+                seq_level_imp = sentence_importance(sdlg_gen_list[0], sdlg_gen_list[1:], nli_model_sent, target_pairs)
+    
+                # NEW: Weight down by generation likelihood
+                # Extract numerical likelihood values from the prepared likelihood dictionaries
+                # Using average_neg_log_likelihood and converting to positive likelihood
+                likelihood_values = []
+                for likelihood_dict in prepared_likelihoods:
+                    avg_neg_log_likelihood = likelihood_dict['average_neg_log_likelihood'][0]
+                    # Convert negative log-likelihood to likelihood: likelihood = exp(-neg_log_likelihood)
+                    likelihood = torch.exp(torch.tensor(-avg_neg_log_likelihood))
+                    likelihood_values.append(likelihood)
+    
+                # Convert to tensor and ensure same device as seq_level_imp
+                generation_likelihoods = torch.stack(likelihood_values).to(seq_level_imp.device)
+    
+              # Add small epsilon to avoid division by zero
+                # epsilon = 1e-8
+                # generation_likelihoods = generation_likelihoods + epsilon
+    
+                imp_weight =  generation_likelihoods / seq_level_imp 
+                imp_weight = seq_level_imp.detach().to('cpu')
+                results_dict[method]['seq_level_impo'] = imp_weight
+    
+                with open(os.path.join(base_path, f'results_dict_{i}.pkl'), 'wb') as f:
+                    pickle.dump(results_dict, f)
