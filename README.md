@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 3. Run experiments with ```run_experiments.py```. Note: You need to set the output path. You can also change the dataset, prompt format, or the model here
 
-4. Analyze results with ```analyze_results.ipynb```
+4. Analyze results with ```analyze_results.ipynb```. Again set paths accordingly
 
 ## Contact
 
