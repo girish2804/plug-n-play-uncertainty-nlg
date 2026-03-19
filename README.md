@@ -17,4 +17,3 @@ pip install -r requirements.txt
 
 ## Contact
 
-For support or queries, reach out at [girishg1502@gmail.com].
